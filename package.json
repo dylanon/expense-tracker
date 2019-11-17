@@ -1,0 +1,14 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "Budget & expense tracker app.",
+  "author": "Dylan On <hey@dylanon.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "git-cz": "^3.3.0"
+  },
+  "scripts": {
+    "cz": "git-cz"
+  }
+}
