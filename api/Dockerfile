@@ -3,4 +3,4 @@ WORKDIR /api
 COPY . /api
 EXPOSE ${API_PORT}
 RUN yarn
-CMD yarn start
+CMD yarn ${API_START_COMMAND:-start}
