@@ -5,8 +5,4 @@ const knex = instantiateKnex({
   connection: 'postgresql://postgres@db:5432',
 })
 
-knex('transactions')
-  .select('*')
-  .then(txs => {
-    console.log('txs', txs)
-  })
+module.exports = knex
