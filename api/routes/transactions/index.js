@@ -1,11 +1,16 @@
 const { Router } = require('express')
 const knex = require('../../db')
 const { createBadRequestError } = require('../../utils')
-const { createSchema, deleteSchema } = require('./schemas')
+const { createSchema, readSchema, deleteSchema } = require('./schemas')
 
 const router = new Router()
 
 const dbTable = 'transactions'
+
+const list = async (req, res) => {
+  const list = await knex('transactions').select('*')
+  res.json(list)
+}
 
 const create = async (req, res) => {
   // validate properties
@@ -28,9 +33,19 @@ const create = async (req, res) => {
   res.status(201).json(transaction)
 }
 
-const list = async (req, res) => {
-  const list = await knex('transactions').select('*')
-  res.json(list)
+const read = async (req, res) => {
+  const { id } = await readSchema
+    .validateAsync(req.params)
+    .catch(error => res.status(400).json(createBadRequestError(error)))
+  const [transaction] = await knex('transactions')
+    .returning(['id', 'amount', 'date', 'name', 'type'])
+    .where('id', id)
+  if (!transaction) {
+    return res
+      .status(404)
+      .json({ errors: [`Could not find a transaction with id ${id}.`] })
+  }
+  res.json(transaction)
 }
 
 const del = async (req, res) => {
@@ -50,8 +65,9 @@ const del = async (req, res) => {
   res.json(deletedTransaction)
 }
 
-router.post('/', create)
 router.get('/', list)
+router.post('/', create)
+router.get('/:id', read)
 router.delete('/:id', del)
 
 module.exports = router
