@@ -1,7 +1,13 @@
 const { Router } = require('express')
 const knex = require('../../db')
 const { createBadRequestError } = require('../../utils')
-const { createSchema, readSchema, deleteSchema } = require('./schemas')
+const {
+  createSchema,
+  readSchema,
+  updateParamsSchema,
+  updateBodySchema,
+  deleteSchema,
+} = require('./schemas')
 
 const router = new Router()
 
@@ -48,6 +54,30 @@ const read = async (req, res) => {
   res.json(transaction)
 }
 
+const update = async (req, res) => {
+  // validate id parameter
+  const { id } = await updateParamsSchema
+    .validateAsync(req.params)
+    .catch(error => res.status(400).json(createBadRequestError(error)))
+  // validate properties to update
+  const updates = await updateBodySchema
+    .validateAsync(req.body)
+    .catch(error => res.status(400).json(createBadRequestError(error)))
+  // TODO: Prevent handler from continuing after failed validation (all endpoints)
+  // ! Issue appears to be using async/await with .catch instead of try/catch
+  const [updatedTransaction] = await knex(dbTable)
+    .returning(['id', 'amount', 'date', 'name', 'type'])
+    .where('id', id)
+    .update(updates)
+    .catch(error => res.status(500).json({ errors: [error] }))
+  if (!updatedTransaction) {
+    return res
+      .status(404)
+      .json({ errors: [`Could not find a transaction with id ${id}.`] })
+  }
+  res.json(updatedTransaction)
+}
+
 const del = async (req, res) => {
   const { id } = await deleteSchema
     .validateAsync(req.params)
@@ -68,6 +98,7 @@ const del = async (req, res) => {
 router.get('/', list)
 router.post('/', create)
 router.get('/:id', read)
+router.patch('/:id', update)
 router.delete('/:id', del)
 
 module.exports = router

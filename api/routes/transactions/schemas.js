@@ -15,6 +15,17 @@ const createSchema = joi.object({
     .required(),
 })
 
+const updateParamsSchema = byIdSchema
+
+const updateBodySchema = joi
+  .object({
+    amount: joi.number(),
+    date: joi.date(),
+    name: joi.string(),
+    type: joi.string().valid(...Object.values(TRANSACTION_TYPE)),
+  })
+  .unknown(false)
+
 const readSchema = byIdSchema
 
 const deleteSchema = byIdSchema
@@ -22,5 +33,7 @@ const deleteSchema = byIdSchema
 module.exports = {
   createSchema,
   readSchema,
+  updateParamsSchema,
+  updateBodySchema,
   deleteSchema,
 }
