@@ -11,6 +11,11 @@ const createSchema = joi.object({
     .required(),
 })
 
+const deleteSchema = joi.object({
+  id: joi.number().required(),
+})
+
 module.exports = {
   createSchema,
+  deleteSchema,
 }
