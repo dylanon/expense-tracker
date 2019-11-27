@@ -14,7 +14,7 @@ const router = new Router()
 const dbTable = 'transactions'
 
 const list = async (req, res) => {
-  const list = await knex('transactions').select('*')
+  const list = await knex(dbTable).select('*')
   res.json(list)
 }
 
@@ -43,7 +43,7 @@ const read = async (req, res) => {
   const { id } = await readSchema
     .validateAsync(req.params)
     .catch(error => res.status(400).json(createBadRequestError(error)))
-  const [transaction] = await knex('transactions')
+  const [transaction] = await knex(dbTable)
     .returning(['id', 'amount', 'date', 'name', 'type'])
     .where('id', id)
   if (!transaction) {
