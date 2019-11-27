@@ -21,6 +21,9 @@
   },
   "scripts": {
     "dev": "nodemon index.js",
+    "migrate:down": "knex migrate:down",
+    "migrate:latest": "knex migrate:latest",
+    "migrate:up": "knex migrate:up",
     "start": "node index.js"
   }
 }
