@@ -1,6 +1,5 @@
 const { Router } = require('express')
 const knex = require('../../db')
-const { createBadRequestError } = require('../../utils')
 const {
   createSchema,
   readSchema,
@@ -18,81 +17,80 @@ const list = async (req, res) => {
   res.json(list)
 }
 
-const create = async (req, res) => {
-  // validate properties
-  const body = await createSchema
-    .validateAsync(req.body)
-    .catch(error => res.status(400).json(createBadRequestError(error)))
-  // insert into db
-  const { amount, type } = body
-  const { date = new Date(), name = 'Transaction' } = body
-  const [transaction] = await knex(dbTable)
-    .returning(['id', 'amount', 'date', 'name', 'type'])
-    .insert({
-      amount,
-      date,
-      name,
-      type,
-    })
-    .catch(error => res.status(500).json({ errors: [error] }))
-  // return created transaction
-  res.status(201).json(transaction)
+const create = async (req, res, next) => {
+  try {
+    const body = await createSchema.validateAsync(req.body)
+    const { amount, type } = body
+    const { date = new Date(), name = 'Transaction' } = body
+    const [transaction] = await knex(dbTable)
+      .returning(['id', 'amount', 'date', 'name', 'type'])
+      .insert({
+        amount,
+        date,
+        name,
+        type,
+      })
+    res.status(201).json(transaction)
+  } catch (error) {
+    next(error)
+  }
 }
 
-const read = async (req, res) => {
-  const { id } = await readSchema
-    .validateAsync(req.params)
-    .catch(error => res.status(400).json(createBadRequestError(error)))
-  const [transaction] = await knex(dbTable)
-    .returning(['id', 'amount', 'date', 'name', 'type'])
-    .where('id', id)
-  if (!transaction) {
-    return res
-      .status(404)
-      .json({ errors: [`Could not find a transaction with id ${id}.`] })
+const read = async (req, res, next) => {
+  try {
+    const { id } = await readSchema.validateAsync(req.params)
+    const [transaction] = await knex(dbTable)
+      .returning(['id', 'amount', 'date', 'name', 'type'])
+      .where('id', id)
+    if (!transaction) {
+      // TODO: Add NotFoundError to error handling
+      return res
+        .status(404)
+        .json({ errors: [`Could not find a transaction with id ${id}.`] })
+    }
+    res.json(transaction)
+  } catch (error) {
+    next(error)
   }
-  res.json(transaction)
 }
 
-const update = async (req, res) => {
-  // validate id parameter
-  const { id } = await updateParamsSchema
-    .validateAsync(req.params)
-    .catch(error => res.status(400).json(createBadRequestError(error)))
-  // validate properties to update
-  const updates = await updateBodySchema
-    .validateAsync(req.body)
-    .catch(error => res.status(400).json(createBadRequestError(error)))
-  // TODO: Prevent handler from continuing after failed validation (all endpoints)
-  // ! Issue appears to be using async/await with .catch instead of try/catch
-  const [updatedTransaction] = await knex(dbTable)
-    .returning(['id', 'amount', 'date', 'name', 'type'])
-    .where('id', id)
-    .update(updates)
-    .catch(error => res.status(500).json({ errors: [error] }))
-  if (!updatedTransaction) {
-    return res
-      .status(404)
-      .json({ errors: [`Could not find a transaction with id ${id}.`] })
+const update = async (req, res, next) => {
+  try {
+    const { id } = await updateParamsSchema.validateAsync(req.params)
+    const updates = await updateBodySchema.validateAsync(req.body)
+    const [updatedTransaction] = await knex(dbTable)
+      .returning(['id', 'amount', 'date', 'name', 'type'])
+      .where('id', id)
+      .update(updates)
+    if (!updatedTransaction) {
+      // TODO: Add NotFoundError to error handling
+      return res
+        .status(404)
+        .json({ errors: [`Could not find a transaction with id ${id}.`] })
+    }
+    res.json(updatedTransaction)
+  } catch (error) {
+    next(error)
   }
-  res.json(updatedTransaction)
 }
 
-const del = async (req, res) => {
-  const { id } = await deleteSchema
-    .validateAsync(req.params)
-    .catch(error => res.status(400).json(createBadRequestError(error)))
-  const [deletedTransaction] = await knex(dbTable)
-    .returning(['id', 'amount', 'date', 'name', 'type'])
-    .where('id', id)
-    .delete()
-    .catch(error => res.status(500).json({ errors: [error] }))
-  if (!deletedTransaction) {
-    return res
-      .status(404)
-      .json({ errors: [`Could not find a transaction with id ${id}.`] })
+const del = async (req, res, next) => {
+  try {
+    const { id } = await deleteSchema.validateAsync(req.params)
+    const [deletedTransaction] = await knex(dbTable)
+      .returning(['id', 'amount', 'date', 'name', 'type'])
+      .where('id', id)
+      .delete()
+    if (!deletedTransaction) {
+      // TODO: Add NotFoundError to error handling
+      return res
+        .status(404)
+        .json({ errors: [`Could not find a transaction with id ${id}.`] })
+    }
+    res.json(deletedTransaction)
+  } catch (error) {
+    next(error)
   }
-  res.json(deletedTransaction)
 }
 
 router.get('/', list)
