@@ -32,6 +32,8 @@ const login = async (req, res, next) => {
     const token = jwt.sign(claim, AUTH_SIGNING_SECRET, {
       expiresIn: '1d',
     })
+    // TODO: Harden cookie security (httpOnly, sameSite, secure, expires)
+    res.cookie('auth', token)
     res.json({ token })
   } catch (error) {
     next(error)
