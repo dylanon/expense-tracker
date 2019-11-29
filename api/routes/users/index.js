@@ -21,6 +21,7 @@ const create = async (req, res, next) => {
   try {
     const body = await createSchema.validateAsync(req.body)
     const { email, username, password } = body
+    // TODO: Only store encrypted/hashed password (use bcrypt)
     const [user] = await knex(dbTable)
       .returning(['id', 'email', 'username'])
       .insert({
