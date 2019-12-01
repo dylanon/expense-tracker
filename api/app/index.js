@@ -1,10 +1,12 @@
 const express = require('express')
+const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const routes = require('../routes')
 const { errorHandler } = require('../middleware')
 
 const app = express()
 
+app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(routes)
 app.use(errorHandler)
