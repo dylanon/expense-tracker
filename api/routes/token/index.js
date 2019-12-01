@@ -1,7 +1,9 @@
 const { Router } = require('express')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 const knex = require('../../db')
 const { loginSchema } = require('./schemas')
-const jwt = require('jsonwebtoken')
 
 const AUTH_SIGNING_SECRET = process.env.AUTH_SIGNING_SECRET
 
@@ -17,17 +19,27 @@ const login = async (req, res, next) => {
   try {
     const body = await loginSchema.validateAsync(req.body)
     const { username, password } = body
+
     const [user] = await knex('users')
-      .select(['username', 'password'])
+      .select(['password'])
       .where({
         username,
-        password,
       })
-    // TODO: Verify encrypted-at-rest passwords with bcrypt
     if (!user) {
-      // TODO: Add NotFoundError to error handling
-      return res.status(404).json({ errors: [`Could not find user.`] })
+      // TODO: Add Forbidden to error handling
+      return res
+        .status(403)
+        .json({ errors: [`Incorrect username or password.`] })
     }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password)
+    if (!isPasswordCorrect) {
+      // TODO: Add Forbidden to error handling
+      return res
+        .status(403)
+        .json({ errors: [`Incorrect username or password.`] })
+    }
+
     const claim = { username }
     const token = jwt.sign(claim, AUTH_SIGNING_SECRET, {
       expiresIn: '1d',

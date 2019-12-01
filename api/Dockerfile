@@ -1,6 +1,5 @@
-FROM node:12-alpine
+FROM node:12
 WORKDIR /api
 COPY . /api
 EXPOSE ${API_PORT}
-RUN yarn
-CMD yarn ${API_START_COMMAND:-start}
+CMD yarn && yarn ${API_START_COMMAND:-start}
