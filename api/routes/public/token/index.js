@@ -2,7 +2,7 @@ const { Router } = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const knex = require('../../db')
+const knex = require('../../../db')
 const { loginSchema } = require('./schemas')
 
 const AUTH_SIGNING_SECRET = process.env.AUTH_SIGNING_SECRET
