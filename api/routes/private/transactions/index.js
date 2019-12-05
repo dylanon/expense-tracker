@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const knex = require('../../db')
+const knex = require('../../../db')
 const {
   createSchema,
   readSchema,

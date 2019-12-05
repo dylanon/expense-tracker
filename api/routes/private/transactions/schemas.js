@@ -1,5 +1,5 @@
 const joi = require('@hapi/joi')
-const { TRANSACTION_TYPE } = require('../../constants')
+const { TRANSACTION_TYPE } = require('../../../constants')
 
 const byIdSchema = joi.object({
   id: joi.number().required(),

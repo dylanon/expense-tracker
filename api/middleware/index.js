@@ -1,9 +1,9 @@
 const isAuthenticated = require('./isAuthenticated')
 const errorHandler = require('./errorHandler')
-const routeHandler = require('./routeHandler')
+const user = require('./user')
 
 module.exports = {
   isAuthenticated,
   errorHandler,
-  routeHandler,
+  user,
 }

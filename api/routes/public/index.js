@@ -1,7 +1,10 @@
+const { Router } = require('express')
+const router = new Router()
+
 const token = require('./token')
 const users = require('./users')
 
-module.exports = {
-  token,
-  users,
-}
+router.use('/token', token)
+router.use('/users', users)
+
+module.exports = router
