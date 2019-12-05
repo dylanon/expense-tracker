@@ -19,6 +19,7 @@ const list = async (req, res) => {
 
 const create = async (req, res, next) => {
   try {
+    const { user } = req
     const body = await createSchema.validateAsync(req.body)
     const { amount, type } = body
     const { date = new Date(), name = 'Transaction' } = body
@@ -29,6 +30,7 @@ const create = async (req, res, next) => {
         date,
         name,
         type,
+        createdBy: user.id,
       })
     res.status(201).json(transaction)
   } catch (error) {
