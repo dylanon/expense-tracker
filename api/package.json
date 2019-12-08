@@ -17,6 +17,10 @@
     "pg": "^7.13.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.7.5",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
     "nodemon": "^1.19.4",
     "supertest": "^4.0.2"
@@ -30,7 +34,7 @@
     "migrate:latest": "knex migrate:latest",
     "migrate:up": "knex migrate:up",
     "start": "node index.js",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "NODE_ENV=test yarn migrate:latest && jest --forceExit",
+    "test:watch": "yarn test --watchAll"
   }
 }
