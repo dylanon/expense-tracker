@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const knex = require('../db')
 
-class ResourceHandler {
+class Resource {
   constructor(resourceName, dbTable, schemas, options = {}) {
     if (!resourceName || !dbTable || !schemas) {
       throw new Error(
@@ -122,4 +122,4 @@ class ResourceHandler {
   }
 }
 
-module.exports = ResourceHandler
+module.exports = Resource
