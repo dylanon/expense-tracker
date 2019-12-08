@@ -1,5 +1,5 @@
 const schemas = require('./schemas')
-const ResourceHandler = require('../../../models/ResourceHandler')
+const Resource = require('../../../models/Resource')
 
 const resourceName = 'user'
 const dbTable = 'users'
@@ -10,11 +10,6 @@ const options = {
   // Omit password for security
   returnAttributes: ['id', 'email', 'username'],
 }
-const resourceHandler = new ResourceHandler(
-  resourceName,
-  dbTable,
-  schemas,
-  options
-)
+const resource = new Resource(resourceName, dbTable, schemas, options)
 
-module.exports = resourceHandler.router
+module.exports = resource.router

@@ -1,8 +1,8 @@
 const schemas = require('./schemas')
-const ResourceHandler = require('../../../models/ResourceHandler')
+const Resource = require('../../../models/Resource')
 
 const resourceName = 'project'
 const dbTable = 'projects'
-const resourceHandler = new ResourceHandler(resourceName, dbTable, schemas)
+const resource = new Resource(resourceName, dbTable, schemas)
 
-module.exports = resourceHandler.router
+module.exports = resource.router
