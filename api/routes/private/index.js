@@ -3,6 +3,8 @@ const router = new Router()
 
 const { isAuthenticated, user } = require('../../middleware')
 
+const budgets = require('./budgets')
+const projects = require('./projects')
 const transactions = require('./transactions')
 const users = require('./users')
 
@@ -11,6 +13,8 @@ router.use(isAuthenticated)
 router.use(user)
 
 // Routes
+router.use('/budgets', budgets)
+router.use('/projects', projects)
 router.use('/transactions', transactions)
 router.use('/users', users)
 
