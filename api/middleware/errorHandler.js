@@ -5,6 +5,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     res.status(400).json(createBadRequestError(err))
   } else {
+    console.log(err)
     res.status(500).json({ errors: ['Sorry, something went wrong.'] })
   }
 }
