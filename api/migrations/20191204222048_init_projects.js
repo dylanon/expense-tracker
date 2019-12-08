@@ -3,7 +3,7 @@ exports.up = function(knex) {
     table.bigIncrements('id')
     table.text('name')
     table
-      .bigInteger('owner')
+      .bigInteger('createdBy')
       .references('id')
       .inTable('users')
   })
