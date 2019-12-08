@@ -1,82 +1,20 @@
-const { Router } = require('express')
+const schemas = require('./schemas')
+const ResourceHandler = require('../../../models/ResourceHandler')
 
-const knex = require('../../../db')
-const {
-  readSchema,
-  updateParamsSchema,
-  updateBodySchema,
-  deleteSchema,
-} = require('./schemas')
-
-const router = new Router()
-
+const resourceName = 'user'
 const dbTable = 'users'
-
-const list = async (req, res) => {
-  const list = await knex(dbTable).select(['id', 'email', 'username'])
-  res.json(list)
+const options = {
+  operations: {
+    create: false,
+  },
+  // Omit password for security
+  returnAttributes: ['id', 'email', 'username'],
 }
+const resourceHandler = new ResourceHandler(
+  resourceName,
+  dbTable,
+  schemas,
+  options
+)
 
-const read = async (req, res, next) => {
-  try {
-    const { id } = await readSchema.validateAsync(req.params)
-    const [user] = await knex(dbTable)
-      .select(['id', 'email', 'username'])
-      .where('id', id)
-    if (!user) {
-      // TODO: Add NotFoundError to error handling
-      return res
-        .status(404)
-        .json({ errors: [`Could not find a user with id ${id}.`] })
-    }
-    res.json(user)
-  } catch (error) {
-    next(error)
-  }
-}
-
-const update = async (req, res, next) => {
-  try {
-    const { id } = await updateParamsSchema.validateAsync(req.params)
-    const updates = await updateBodySchema.validateAsync(req.body)
-    const [updatedUser] = await knex(dbTable)
-      .returning(['id', 'email', 'username'])
-      .where('id', id)
-      .update(updates)
-    if (!updatedUser) {
-      // TODO: Add NotFoundError to error handling
-      return res
-        .status(404)
-        .json({ errors: [`Could not find a user with id ${id}.`] })
-    }
-    res.json(updatedUser)
-  } catch (error) {
-    next(error)
-  }
-}
-
-const del = async (req, res, next) => {
-  try {
-    const { id } = await deleteSchema.validateAsync(req.params)
-    const [deletedUser] = await knex(dbTable)
-      .returning(['id', 'email', 'username'])
-      .where('id', id)
-      .delete()
-    if (!deletedUser) {
-      // TODO: Add NotFoundError to error handling
-      return res
-        .status(404)
-        .json({ errors: [`Could not find a user with id ${id}.`] })
-    }
-    res.json(deletedUser)
-  } catch (error) {
-    next(error)
-  }
-}
-
-router.get('/', list)
-router.get('/:id', read)
-router.patch('/:id', update)
-router.delete('/:id', del)
-
-module.exports = router
+module.exports = resourceHandler.router

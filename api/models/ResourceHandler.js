@@ -2,26 +2,45 @@ const { Router } = require('express')
 const knex = require('../db')
 
 class ResourceHandler {
-  constructor(resourceName, dbTable, schemas) {
+  constructor(resourceName, dbTable, schemas, options = {}) {
     if (!resourceName || !dbTable || !schemas) {
       throw new Error(
         'ResourceHandler: One or more invalid constructor arguments.'
       )
     }
+    const { operations, returnAttributes = '*' } = options
+    const {
+      list = true,
+      create = true,
+      read = true,
+      update = true,
+      delete: del = true,
+    } = operations || {}
+    const router = new Router()
+    if (list) {
+      router.get('/', this.list)
+    }
+    if (create) {
+      router.post('/:id', this.create)
+    }
+    if (read) {
+      router.get('/:id', this.read)
+    }
+    if (update) {
+      router.patch('/:id', this.update)
+    }
+    if (del) {
+      router.delete('/:id', this.del)
+    }
+    this.router = router
     this.resourceName = resourceName
     this.dbTable = dbTable
     this.schemas = schemas
-    const router = new Router()
-    router.get('/', this.list)
-    router.post('/', this.create)
-    router.get('/:id', this.read)
-    router.patch('/:id', this.update)
-    router.delete('/:id', this.del)
-    this.router = router
+    this.returnAttributes = returnAttributes
   }
 
   list = async (req, res) => {
-    const list = await knex(this.dbTable).select('*')
+    const list = await knex(this.dbTable).select(this.returnAttributes)
     res.json(list)
   }
 
@@ -33,7 +52,7 @@ class ResourceHandler {
         createdBy: user.id,
       })
       const [resource] = await knex(this.dbTable)
-        .returning('*')
+        .returning(this.returnAttributes)
         .insert(attributes)
       res.status(201).json(resource)
     } catch (error) {
@@ -45,7 +64,7 @@ class ResourceHandler {
     try {
       const { id } = await this.schemas.readSchema.validateAsync(req.params)
       const [resource] = await knex(this.dbTable)
-        .returning('*')
+        .returning(this.returnAttributes)
         .where('id', id)
       if (!resource) {
         // TODO: Add NotFoundError to error handling
@@ -68,7 +87,7 @@ class ResourceHandler {
         req.body
       )
       const [updatedResource] = await knex(this.dbTable)
-        .returning('*')
+        .returning(this.returnAttributes)
         .where('id', id)
         .update(updates)
       if (!updatedResource) {
@@ -87,7 +106,7 @@ class ResourceHandler {
     try {
       const { id } = await this.schemas.deleteSchema.validateAsync(req.params)
       const [deletedResource] = await knex(this.dbTable)
-        .returning('*')
+        .returning(this.returnAttributes)
         .where('id', id)
         .delete()
       if (!deletedResource) {
