@@ -1,10 +1,10 @@
 const { Router } = require('express')
 const router = new Router()
 
-const public = require('./public')
-const private = require('./private')
+const unauthenticated = require('./unauthenticated')
+const authenticated = require('./authenticated')
 
-router.use(public)
-router.use(private)
+router.use(unauthenticated)
+router.use(authenticated)
 
 module.exports = router
