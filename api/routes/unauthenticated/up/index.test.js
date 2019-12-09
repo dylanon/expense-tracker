@@ -1,14 +1,13 @@
-const express = require('express')
 const request = require('supertest')
+const app = require('../../../app')
 const up = require('./')
 
-const testApp = express()
-testApp.use(up)
+app.use(up)
 
-describe('GET /', () => {
-  test('sends a success response', () => {
-    return request(testApp)
-      .get('/')
+describe('/up (unauthenticated)', () => {
+  test('GET sends a success response', () => {
+    return request(app)
+      .get('/up')
       .expect(200, '👍')
   })
 })
