@@ -39,15 +39,45 @@ beforeAll(async () => {
 })
 
 describe('/token (unauthenticated)', () => {
-  test('POST responds with success', () => {
-    return request(app)
-      .post('/token')
-      .send({
-        username,
-        password: plainTextPassword,
-      })
-      .expect(200)
+
+  describe('with correct credentials', () => {
+
+    test('POST responds with success', () => {
+      return request(app)
+        .post('/token')
+        .send({
+          username,
+          password: plainTextPassword,
+        })
+        .expect(200)
+    })
+
   })
+
+  describe('with wrong credentials', () => {
+
+    test('POST responds with forbidden (wrong password)', () => {
+      return request(app)
+        .post('/token')
+        .send({
+          username,
+          password: 'wrongpassword',
+        })
+        .expect(403)
+    })
+
+    test('POST responds with forbidden (wrong username)', () => {
+      return request(app)
+        .post('/token')
+        .send({
+          username: 'wrongusername',
+          password: plainTextPassword,
+        })
+        .expect(403)
+    })
+
+  })
+
 })
 
 afterAll(deleteUser)
