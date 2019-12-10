@@ -1,14 +1,14 @@
 version: '3'
 services:
   api:
-    build: api
+    build: .
     depends_on:
       - db
     env_file: .env
     ports:
       - '${API_PORT}:${API_PORT}'
     volumes:
-      - ./api:/api
+      - .:/api
 
   db:
     image: postgres:12-alpine
