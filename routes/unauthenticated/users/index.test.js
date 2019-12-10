@@ -3,9 +3,9 @@ const app = require('../../../app')
 const knex = require('../../../db')
 
 const dbTable = 'users'
-const username = 'testuser'
+const username = 'unauthedUsersEndpoint'
 const password = '12341234'
-const email = 'testuser@test.com'
+const email = 'unauthedUsersEndpoint@test.com'
 
 const deleteUser = async () => {
   try {
@@ -13,18 +13,16 @@ const deleteUser = async () => {
     .where({ username })
     .del()
   } catch (error) {
-    throw new Error('Failed to delete user.')
+    throw new Error(`Failed to delete user. ${error}`)
   }
 }
 
-beforeAll(deleteUser)
-
-afterEach(deleteUser)
-
 describe('/users (unauthenticated)', () => {
-
+  
   describe('with valid user info', () => {
-
+    beforeAll(deleteUser)
+    afterAll(deleteUser)
+    
     test('POST creates a user & does not send password in response', async () => {
       const { body: createdUser } = await request(app)
         .post('/users')

@@ -5,9 +5,9 @@ const { hashPassword } = require('../../../utils')
 
 const dbTable = 'users'
 
-const username = 'testUser'
+const username = 'unauthedTokenEndpoint'
 const plainTextPassword = '12341234'
-const email = 'testuser@test.com'
+const email = 'unauthedTokenEndpoint@test.com'
 
 const createUser = async (userInfo) => {
   try {

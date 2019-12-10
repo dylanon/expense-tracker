@@ -36,7 +36,7 @@
     "migrate:latest": "knex migrate:latest",
     "migrate:up": "knex migrate:up",
     "start": "node index.js",
-    "test": "NODE_ENV=test yarn migrate:latest && jest --forceExit",
-    "test:watch": "yarn test --watchAll"
+    "test": "NODE_ENV=test yarn migrate:latest && jest",
+    "test:watch": "yarn test --watch"
   }
 }
