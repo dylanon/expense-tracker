@@ -1,5 +1,5 @@
 const knex = require('../../db')
-const { hashPassword } = require('../../utils')
+const { createAuthToken, hashPassword } = require('../../utils')
 
 class User {
   constructor(username, plainTextPassword, email) {
@@ -35,6 +35,13 @@ class User {
     } catch (error) {
       throw new Error(`Failed to delete user. ${error}`)
     }
+  }
+
+  getAuthCookie = () => {
+    const token = createAuthToken({
+      username: this.username,
+    })
+    return `auth=${token}; path=/; domain=localhost;`
   }
 }
 

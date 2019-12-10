@@ -1,17 +1,9 @@
 const { Router } = require('express')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const { createAuthToken } = require('../../../utils')
 
 const knex = require('../../../db')
 const { loginSchema } = require('./schemas')
-
-const AUTH_SIGNING_SECRET = process.env.AUTH_SIGNING_SECRET
-
-if (!AUTH_SIGNING_SECRET) {
-  throw new Error(
-    'Critical error: A signing secret was not provided to the authentication module.'
-  )
-}
 
 const router = new Router()
 
@@ -41,9 +33,7 @@ const login = async (req, res, next) => {
     }
 
     const claim = { username }
-    const token = jwt.sign(claim, AUTH_SIGNING_SECRET, {
-      expiresIn: '1d',
-    })
+    const token = createAuthToken(claim)
     // TODO: Harden cookie security (httpOnly, sameSite, secure, expires)
     res.cookie('auth', token)
     res.json({ token })
