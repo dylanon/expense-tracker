@@ -1,49 +1,39 @@
 const request = require('supertest')
 const app = require('../../../app')
-const knex = require('../../../db')
+const UserFixture = require('../../../testing/fixtures/User')
 
-const dbTable = 'users'
 const username = 'unauthedUsersEndpoint'
 const password = '12341234'
 const email = 'unauthedUsersEndpoint@test.com'
 
-const deleteUser = async () => {
-  try {
-    await knex(dbTable)
-    .where({ username })
-    .del()
-  } catch (error) {
-    throw new Error(`Failed to delete user. ${error}`)
-  }
-}
+const user = new UserFixture(username, password, email)
 
 describe('/users (unauthenticated)', () => {
-  
   describe('with valid user info', () => {
-    beforeAll(deleteUser)
-    afterAll(deleteUser)
-    
+    beforeAll(user.destroy)
+    afterAll(user.destroy)
+
     test('POST creates a user & does not send password in response', async () => {
       const { body: createdUser } = await request(app)
         .post('/users')
         .send({
           username,
           password,
-          email
+          email,
         })
         .expect(201)
-      expect(createdUser).toEqual(expect.objectContaining({
-        username,
-        email,
-        id: expect.any(String)
-      }))
+      expect(createdUser).toEqual(
+        expect.objectContaining({
+          username,
+          email,
+          id: expect.any(String),
+        })
+      )
       expect(createdUser.password).toBe(undefined)
     })
-
   })
-  
-  describe('with invalid user info', () => {
 
+  describe('with invalid user info', () => {
     test('POST responds with bad request (no body)', () => {
       return request(app)
         .post('/users')
@@ -55,7 +45,7 @@ describe('/users (unauthenticated)', () => {
         .post('/users')
         .send({
           password,
-          email
+          email,
         })
         .expect(400)
     })
@@ -65,7 +55,7 @@ describe('/users (unauthenticated)', () => {
         .post('/users')
         .send({
           username,
-          email
+          email,
         })
         .expect(400)
     })
@@ -76,7 +66,7 @@ describe('/users (unauthenticated)', () => {
         .send({
           username,
           email,
-          password: '1234123'
+          password: '1234123',
         })
         .expect(400)
     })
@@ -86,7 +76,7 @@ describe('/users (unauthenticated)', () => {
         .post('/users')
         .send({
           username,
-          password
+          password,
         })
         .expect(400)
     })
@@ -97,11 +87,9 @@ describe('/users (unauthenticated)', () => {
         .send({
           username,
           password,
-          email: 'notanemail'
+          email: 'notanemail',
         })
         .expect(400)
     })
-
   })
-  
 })

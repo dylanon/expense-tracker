@@ -1,47 +1,20 @@
 const request = require('supertest')
 const app = require('../../../app')
-const knex = require('../../../db')
-const { hashPassword } = require('../../../utils')
-
-const dbTable = 'users'
+const UserFixture = require('../../../testing/fixtures/User')
 
 const username = 'unauthedTokenEndpoint'
 const plainTextPassword = '12341234'
 const email = 'unauthedTokenEndpoint@test.com'
 
-const createUser = async (userInfo) => {
-  try {
-    await knex(dbTable)
-    .insert(userInfo)
-  } catch (error) {
-    throw new Error('Failed to create user.')
-  }
-}
-
-const deleteUser = async () => {
-  try {
-    await knex(dbTable)
-    .where({ username })
-    .del()
-  } catch (error) {
-    throw new Error('Failed to delete user.')
-  }
-}
+const user = new UserFixture(username, plainTextPassword, email)
 
 beforeAll(async () => {
-  await deleteUser()
-  const hashedPassword = await hashPassword(plainTextPassword)
-  await createUser({
-    username,
-    password: hashedPassword,
-    email
-  })
+  await user.destroy()
+  await user.create()
 })
 
 describe('/token (unauthenticated)', () => {
-
   describe('with correct credentials', () => {
-
     test('POST responds with success', () => {
       return request(app)
         .post('/token')
@@ -51,11 +24,9 @@ describe('/token (unauthenticated)', () => {
         })
         .expect(200)
     })
-
   })
 
   describe('with wrong credentials', () => {
-
     test('POST responds with forbidden (wrong password)', () => {
       return request(app)
         .post('/token')
@@ -75,9 +46,7 @@ describe('/token (unauthenticated)', () => {
         })
         .expect(403)
     })
-
   })
-
 })
 
-afterAll(deleteUser)
+afterAll(user.destroy)
