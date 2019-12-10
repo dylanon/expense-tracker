@@ -1,9 +1,8 @@
 const { Router } = require('express')
-const bcrypt = require('bcrypt')
 
-const { createSchema } = require('./schemas')
 const knex = require('../../../db')
-const { PASSWORD_SALT_ROUNDS } = require('../../../constants')
+const { hashPassword } = require('../../../utils')
+const { createSchema } = require('./schemas')
 
 const router = new Router()
 const dbTable = 'users'
@@ -20,7 +19,7 @@ const create = async (req, res, next) => {
       // TODO: Add to error handling
       return res.status(409).json({ errors: ['User already exists.'] })
     }
-    const hashedPassword = await bcrypt.hash(password, PASSWORD_SALT_ROUNDS)
+    const hashedPassword = await hashPassword(password)
     const [user] = await knex(dbTable)
       .returning(['id', 'email', 'username'])
       .insert({

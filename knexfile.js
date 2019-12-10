@@ -4,8 +4,11 @@ module.exports = {
   development: {
     client: 'pg',
     connection: 'postgresql://postgres@db:5432',
-    // TODO: Set NODE_ENV in container & dynamically set `debug` property
     debug: true,
+  },
+  test: {
+    client: 'pg',
+    connection: 'postgresql://postgres@test_db:5432',
   },
   // staging: {
   //   client: 'postgresql',
