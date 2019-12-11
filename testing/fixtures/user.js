@@ -6,6 +6,7 @@ class User {
     this.username = username
     this.plainTextPassword = plainTextPassword
     this.email = email
+    this.id = null
     this.dbTable = 'users'
   }
 
@@ -19,6 +20,7 @@ class User {
           email: this.email,
         })
         .returning('*')
+      this.id = created.id
       return created
     } catch (error) {
       throw new Error(`Failed to create user. ${error}`)
