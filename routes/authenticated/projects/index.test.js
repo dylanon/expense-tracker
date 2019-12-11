@@ -1,6 +1,7 @@
 const request = require('supertest')
 const app = require('../../../app')
 const UserFixture = require('../../../testing/fixtures/User')
+const { createAgentWithAuth } = require('../../../testing/helpers')
 
 describe('with authentication', () => {
   const username = 'authedProjectsEndpoint'
@@ -8,8 +9,6 @@ describe('with authentication', () => {
   const email = `${username}@test.com`
 
   const user = new UserFixture(username, password, email)
-  const api = request(app)
-  const authCookie = user.getAuthCookie()
 
   beforeAll(async () => {
     await user.create()
@@ -20,9 +19,9 @@ describe('with authentication', () => {
   })
 
   it('lists projects', async () => {
-    const { body } = await api
+    const requestWithAuth = createAgentWithAuth(user)
+    const { body } = await requestWithAuth
       .get('/projects')
-      .set('Cookie', authCookie)
       .expect(200)
     // TODO: Truncate the table before these tests run
     expect(body).toEqual([])
