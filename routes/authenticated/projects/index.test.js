@@ -1,7 +1,8 @@
-const request = require('supertest')
-const app = require('../../../app')
 const UserFixture = require('../../../testing/fixtures/User')
-const { createAgentWithAuth } = require('../../../testing/helpers')
+const {
+  createAuthenticatedClient,
+  requestWithoutAuth,
+} = require('../../../testing/helpers')
 
 describe('with authentication', () => {
   const username = 'authedProjectsEndpoint'
@@ -19,10 +20,8 @@ describe('with authentication', () => {
   })
 
   it('lists projects', async () => {
-    const requestWithAuth = createAgentWithAuth(user)
-    const { body } = await requestWithAuth
-      .get('/projects')
-      .expect(200)
+    const requestWithAuth = createAuthenticatedClient(user)
+    const { body } = await requestWithAuth.get('/projects').expect(200)
     // TODO: Truncate the table before these tests run
     expect(body).toEqual([])
   })
@@ -30,13 +29,11 @@ describe('with authentication', () => {
 
 describe('without authentication it responds with 403 Forbidden', () => {
   test('GET /projects', () => {
-    return request(app)
-      .get('/projects')
-      .expect(403)
+    return requestWithoutAuth.get('/projects').expect(403)
   })
 
   test('POST /projects', () => {
-    return request(app)
+    return requestWithoutAuth
       .post('/projects')
       .send({
         blah: 'Some value',
@@ -45,7 +42,7 @@ describe('without authentication it responds with 403 Forbidden', () => {
   })
 
   test('PATCH /projects/:id', () => {
-    return request(app)
+    return requestWithoutAuth
       .patch('/projects/1')
       .send({
         blahblah: 'Some other value',
@@ -54,8 +51,6 @@ describe('without authentication it responds with 403 Forbidden', () => {
   })
 
   test('DELETE /projects/:id', () => {
-    return request(app)
-      .delete('/projects/1')
-      .expect(403)
+    return requestWithoutAuth.delete('/projects/1').expect(403)
   })
 })

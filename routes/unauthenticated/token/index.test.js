@@ -1,6 +1,5 @@
-const request = require('supertest')
-const app = require('../../../app')
 const UserFixture = require('../../../testing/fixtures/User')
+const { requestWithoutAuth } = require('../../../testing/helpers')
 
 const username = 'unauthedTokenEndpoint'
 const plainTextPassword = '12341234'
@@ -16,7 +15,7 @@ beforeAll(async () => {
 describe('/token (unauthenticated)', () => {
   describe('with correct credentials', () => {
     test('POST responds with success', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/token')
         .send({
           username,
@@ -28,7 +27,7 @@ describe('/token (unauthenticated)', () => {
 
   describe('with wrong credentials', () => {
     test('POST responds with forbidden (wrong password)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/token')
         .send({
           username,
@@ -38,7 +37,7 @@ describe('/token (unauthenticated)', () => {
     })
 
     test('POST responds with forbidden (wrong username)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/token')
         .send({
           username: 'wrongusername',

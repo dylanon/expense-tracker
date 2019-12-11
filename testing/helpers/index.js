@@ -1,5 +1,9 @@
-const createAgentWithAuth = require('./createAgentWithAuth')
+const createAuthenticatedClient = require('./createAuthenticatedClient')
+const createUnauthenticatedClient = require('./createUnauthenticatedClient')
+const requestWithoutAuth = require('./requestWithoutAuth')
 
 module.exports = {
-  createAgentWithAuth,
+  createAuthenticatedClient,
+  createUnauthenticatedClient,
+  requestWithoutAuth,
 }

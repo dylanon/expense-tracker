@@ -1,6 +1,5 @@
-const request = require('supertest')
-const app = require('../../../app')
 const UserFixture = require('../../../testing/fixtures/User')
+const { requestWithoutAuth } = require('../../../testing/helpers')
 
 const username = 'unauthedUsersEndpoint'
 const password = '12341234'
@@ -14,7 +13,7 @@ describe('/users (unauthenticated)', () => {
     afterAll(user.destroy)
 
     test('POST creates a user & does not send password in response', async () => {
-      const { body: createdUser } = await request(app)
+      const { body: createdUser } = await requestWithoutAuth
         .post('/users')
         .send({
           username,
@@ -35,13 +34,11 @@ describe('/users (unauthenticated)', () => {
 
   describe('with invalid user info', () => {
     test('POST responds with bad request (no body)', () => {
-      return request(app)
-        .post('/users')
-        .expect(400)
+      return requestWithoutAuth.post('/users').expect(400)
     })
 
     test('POST responds with bad request (no username)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/users')
         .send({
           password,
@@ -51,7 +48,7 @@ describe('/users (unauthenticated)', () => {
     })
 
     test('POST responds with bad request (no password)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/users')
         .send({
           username,
@@ -61,7 +58,7 @@ describe('/users (unauthenticated)', () => {
     })
 
     test('POST responds with bad request (password too short)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/users')
         .send({
           username,
@@ -72,7 +69,7 @@ describe('/users (unauthenticated)', () => {
     })
 
     test('POST responds with bad request (no email)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/users')
         .send({
           username,
@@ -82,7 +79,7 @@ describe('/users (unauthenticated)', () => {
     })
 
     test('POST responds with bad request (invalid email)', () => {
-      return request(app)
+      return requestWithoutAuth
         .post('/users')
         .send({
           username,
