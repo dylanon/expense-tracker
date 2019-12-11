@@ -21,7 +21,7 @@ class Resource {
       router.get('/', this.list)
     }
     if (create) {
-      router.post('/:id', this.create)
+      router.post('/', this.create)
     }
     if (read) {
       router.get('/:id', this.read)
