@@ -2,6 +2,12 @@ const knex = require('../../db')
 
 class Resource {
   constructor(dbTable, attributes) {
+    const { createdBy } = attributes
+    if (!createdBy) {
+      throw new Error(
+        'Resource: `createdBy` is a required argument in constructor.'
+      )
+    }
     this.dbTable = dbTable
     this.attributes = attributes
   }

@@ -1,14 +1,15 @@
 const Resource = require('./Resource')
+const { createSchema } = require('../../routes/authenticated/projects/schemas')
 
 class Project extends Resource {
   constructor(attributes) {
-    const { name = null, createdBy } = attributes
-    if (!createdBy) {
-      throw new Error(
-        'Project: `createdBy` is a required argument constructor.'
-      )
+    const { error, value } = createSchema.validate(attributes, {
+      allowUnknown: true,
+    })
+    if (error) {
+      throw error
     }
-    super('projects', { name, createdBy })
+    super('projects', value)
   }
 }
 

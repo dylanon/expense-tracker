@@ -170,6 +170,7 @@ describe('with authentication', () => {
     it('reads a budget by id', async () => {
       const budget = new BudgetFixture({
         projectId,
+        createdBy: user.id,
       })
       const budgetAttributes = await budget.create()
       const { body } = await requestWithAuth
@@ -190,6 +191,7 @@ describe('with authentication', () => {
     it('updates budget attributes', async () => {
       const originalAttributes = {
         projectId,
+        createdBy: user.id,
         name: 'Old Budget C',
       }
       const attributesToUpdate = {
@@ -229,6 +231,7 @@ describe('with authentication', () => {
     it('prevents updating invalid properties', async () => {
       const budget = new BudgetFixture({
         projectId,
+        createdBy: user.id,
       })
       const { id: budgetId } = await budget.create()
 
@@ -267,6 +270,7 @@ describe('with authentication', () => {
     it('deletes a budget', async () => {
       const budget = new BudgetFixture({
         projectId,
+        createdBy: user.id,
       })
       const attributes = await budget.create()
       const { id: budgetId } = attributes
