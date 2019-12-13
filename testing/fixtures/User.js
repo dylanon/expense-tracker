@@ -30,7 +30,7 @@ class User {
   destroy = async () => {
     try {
       const [destroyed] = await knex(this.dbTable)
-        .where('username', this.username)
+        .where('id', this.id)
         .del()
         .returning('*')
       return destroyed
