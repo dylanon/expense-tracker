@@ -8,8 +8,9 @@ services:
 before_install:
   - curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > wait-for-it.sh
   - chmod 754 wait-for-it.sh
-  - docker-compose up --detach
-  - ./wait-for-it.sh localhost:${API_PORT} --timeout=600 --strict -- echo "Docker network is up."
+  - docker-compose run test_db --detach
+  - docker-compose run api --detach  --service-ports
+  - ./wait-for-it.sh localhost:${API_PORT} --timeout=300 --strict -- echo "Docker network is up."
 
 script:
   - docker-compose exec api yarn test
