@@ -22,6 +22,7 @@
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/preset-env": "^7.7.6",
     "babel-jest": "^24.9.0",
+    "dotenv": "^8.2.0",
     "format-currency": "^1.0.0",
     "git-cz": "^3.3.0",
     "jest": "^24.9.0",
