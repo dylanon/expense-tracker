@@ -9,7 +9,6 @@ services:
       - API_PORT
       - API_START_COMMAND
       - AUTH_SIGNING_SECRET
-    env_file: .env
     ports:
       - '${API_PORT}:${API_PORT}'
     volumes:
