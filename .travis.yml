@@ -6,7 +6,9 @@ services:
   - docker
 
 before_install:
-  - docker-compose up
+  - curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > wait-for-it.sh
+  - docker-compose up --detach
+  - ./wait-for-it.sh localhost:${API_PORT}
 
 script:
   - docker-compose exec api yarn test
