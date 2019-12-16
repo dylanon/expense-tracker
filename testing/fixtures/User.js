@@ -7,6 +7,7 @@ class User {
     this.plainTextPassword = plainTextPassword
     this.email = email
     this.id = null
+    this.attributes = null
     this.dbTable = 'users'
   }
 
@@ -20,8 +21,11 @@ class User {
           email: this.email,
         })
         .returning('*')
+      // TODO: Remove non-standard property user.id
       this.id = created.id
-      return created
+      const { password, ...safeAttributes } = created
+      this.attributes = safeAttributes
+      return safeAttributes
     } catch (error) {
       console.log(`[fixtures/User]: Failed to create user. ${error}`)
     }
