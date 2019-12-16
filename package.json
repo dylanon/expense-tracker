@@ -14,6 +14,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.20.2",
+    "morgan": "^1.9.1",
     "pg": "^7.13.0"
   },
   "devDependencies": {
@@ -21,8 +22,10 @@
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/preset-env": "^7.7.6",
     "babel-jest": "^24.9.0",
+    "format-currency": "^1.0.0",
     "git-cz": "^3.3.0",
     "jest": "^24.9.0",
+    "moment": "^2.24.0",
     "nodemon": "^1.19.4",
     "supertest": "^4.0.2"
   },
@@ -36,7 +39,7 @@
     "migrate:latest": "knex migrate:latest",
     "migrate:up": "knex migrate:up",
     "start": "node index.js",
-    "test": "NODE_ENV=test yarn migrate:latest && jest",
+    "test": "NODE_ENV=test yarn migrate:latest && jest --runInBand --forceExit",
     "test:watch": "yarn test --watch"
   }
 }

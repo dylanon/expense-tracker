@@ -4,3 +4,4 @@ yarn-error.log
 .env*
 
 /.meta
+/coverage

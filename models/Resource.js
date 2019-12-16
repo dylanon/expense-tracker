@@ -21,7 +21,7 @@ class Resource {
       router.get('/', this.list)
     }
     if (create) {
-      router.post('/:id', this.create)
+      router.post('/', this.create)
     }
     if (read) {
       router.get('/:id', this.read)
@@ -64,7 +64,7 @@ class Resource {
     try {
       const { id } = await this.schemas.readSchema.validateAsync(req.params)
       const [resource] = await knex(this.dbTable)
-        .returning(this.returnAttributes)
+        .select(this.returnAttributes)
         .where('id', id)
       if (!resource) {
         // TODO: Add NotFoundError to error handling
