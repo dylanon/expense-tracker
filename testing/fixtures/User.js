@@ -23,7 +23,7 @@ class User {
       this.id = created.id
       return created
     } catch (error) {
-      throw new Error(`Failed to create user. ${error}`)
+      console.log(`[fixtures/User]: Failed to create user. ${error}`)
     }
   }
 
@@ -35,7 +35,7 @@ class User {
         .returning('*')
       return destroyed
     } catch (error) {
-      throw new Error(`Failed to delete user. ${error}`)
+      console.log(`[fixtures/User]: Failed to delete user. ${error}`)
     }
   }
 

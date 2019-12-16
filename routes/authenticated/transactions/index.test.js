@@ -42,9 +42,9 @@ describe('with authentication', () => {
 
   afterAll(async () => {
     await clearTable('transactions')
-    await budget.destroy()
-    await project.destroy()
-    await user.destroy()
+    await clearTable('budgets')
+    await clearTable('projects')
+    await clearTable('users')
   })
 
   it('lists transactions', async () => {
@@ -198,119 +198,122 @@ describe('with authentication', () => {
     })
   })
 
-  //   describe('update', () => {
-  //     it('updates budget attributes', async () => {
-  //       const originalAttributes = {
-  //         projectId,
-  //         createdBy: user.id,
-  //         name: 'Old Budget C',
-  //       }
-  //       const attributesToUpdate = {
-  //         name: 'Budget C',
-  //         startDate: 1572566400000,
-  //         endDate: 1575158399999,
-  //         target: 2100,
-  //       }
-  //       const budget = new BudgetFixture(originalAttributes)
-  //       const { id: budgetId } = await budget.create()
+  describe('update', () => {
+    it('updates transaction attributes', async () => {
+      const originalAttributes = {
+        amount: 502.15,
+        date: '2019-12-13',
+        name: 'Transaction Q',
+        type: TRANSACTION_TYPE.INCOME,
+        createdBy: user.id,
+      }
+      const attributesToUpdate = {
+        name: 'Transaction R',
+        type: TRANSACTION_TYPE.EXPENSE,
+      }
+      const transaction = new TransactionFixture(originalAttributes)
+      const { id: transactionId } = await transaction.create()
 
-  //       const { body } = await requestWithAuth
-  //         .patch(`/budgets/${budgetId}`)
-  //         .send(attributesToUpdate)
-  //         .expect(200)
-  //       const formattedDates = {
-  //         startDate: moment(attributesToUpdate.startDate).toISOString(),
-  //         endDate: moment(attributesToUpdate.endDate).toISOString(),
-  //       }
-  //       const formattedCurrencies = {
-  //         target: formatCurrency(attributesToUpdate.target, {
-  //           format: '%s%v',
-  //           symbol: '$',
-  //         }),
-  //       }
-  //       const expectedAttributes = Object.assign(
-  //         {},
-  //         originalAttributes,
-  //         attributesToUpdate,
-  //         formattedDates,
-  //         formattedCurrencies
-  //       )
-  //       expect(attributesToUpdate).not.toEqual(originalAttributes)
-  //       expect(body).toEqual(expect.objectContaining(expectedAttributes))
-  //     })
+      const { body } = await requestWithAuth
+        .patch(`/transactions/${transactionId}`)
+        .send(attributesToUpdate)
+        .expect(200)
+      const formattedDates = {
+        date: moment(originalAttributes.date).toISOString(),
+      }
+      const formattedCurrencies = {
+        amount: formatCurrency(originalAttributes.amount, {
+          format: '%s%v',
+          symbol: '$',
+        }),
+      }
+      const expectedAttributes = Object.assign(
+        {},
+        originalAttributes,
+        formattedDates,
+        attributesToUpdate,
+        formattedCurrencies
+      )
+      expect(attributesToUpdate).not.toEqual(originalAttributes)
+      expect(body).toEqual(expect.objectContaining(expectedAttributes))
+    })
 
-  //     it('prevents updating invalid properties', async () => {
-  //       const budget = new BudgetFixture({
-  //         projectId,
-  //         createdBy: user.id,
-  //       })
-  //       const { id: budgetId } = await budget.create()
+    it('prevents updating invalid properties', async () => {
+      const budget = new BudgetFixture({
+        projectId,
+        createdBy: user.id,
+      })
+      const { id: budgetId } = await budget.create()
 
-  //       const updateCreatedBy = requestWithAuth
-  //         .patch(`/budgets/${budgetId}`)
-  //         .send({
-  //           createdBy: user.id,
-  //         })
-  //       const updateBlah = requestWithAuth.patch(`/budgets/${budgetId}`).send({
-  //         blah: 'Some text',
-  //       })
-  //       const responses = await Promise.all([updateCreatedBy, updateBlah])
-  //       responses.forEach(response => {
-  //         const {
-  //           status,
-  //           body: { id, errors },
-  //         } = response
-  //         expect(status).toBe(400)
-  //         expect(errors).toEqual(expect.any(Array))
-  //         expect(id).toBeUndefined()
-  //       })
-  //     })
+      const updateCreatedBy = requestWithAuth
+        .patch(`/budgets/${budgetId}`)
+        .send({
+          createdBy: user.id,
+        })
+      const updateBlah = requestWithAuth.patch(`/budgets/${budgetId}`).send({
+        blah: 'Some text',
+      })
+      const responses = await Promise.all([updateCreatedBy, updateBlah])
+      responses.forEach(response => {
+        const {
+          status,
+          body: { id, errors },
+        } = response
+        expect(status).toBe(400)
+        expect(errors).toEqual(expect.any(Array))
+        expect(id).toBeUndefined()
+      })
+    })
 
-  //     it('responds with 404 when the project is not found', async () => {
-  //       const {
-  //         body: { errors },
-  //       } = await requestWithAuth
-  //         .patch(`/budgets/1`)
-  //         .send({ name: 'New Name' })
-  //         .expect(404)
-  //       expect(errors).toEqual(expect.any(Array))
-  //     })
-  //   })
+    it('responds with 404 when the project is not found', async () => {
+      const {
+        body: { errors },
+      } = await requestWithAuth
+        .patch(`/budgets/1`)
+        .send({ name: 'New Name' })
+        .expect(404)
+      expect(errors).toEqual(expect.any(Array))
+    })
+  })
 
-  //   describe('delete', () => {
-  //     it('deletes a budget', async () => {
-  //       const budget = new BudgetFixture({
-  //         projectId,
-  //         createdBy: user.id,
-  //       })
-  //       const attributes = await budget.create()
-  //       const { id: budgetId } = attributes
+  describe('delete', () => {
+    it('deletes a transaction', async () => {
+      const transaction = new TransactionFixture({
+        amount: 111.11,
+        type: TRANSACTION_TYPE.EXPENSE,
+        name: 'Transaction W',
+        createdBy: user.id,
+      })
+      const createdTransaction = await transaction.create()
+      const { id: transactionId } = createdTransaction
 
-  //       const responseWhenRead = await requestWithAuth.get(`/budgets/${budgetId}`)
+      const responseWhenRead = await requestWithAuth.get(
+        `/transactions/${transactionId}`
+      )
 
-  //       const responseWhenDeleted = await requestWithAuth.del(
-  //         `/budgets/${budgetId}`
-  //       )
+      const responseWhenDeleted = await requestWithAuth.del(
+        `/transactions/${transactionId}`
+      )
 
-  //       const responseWhenReadAfterDeleted = await requestWithAuth.get(
-  //         `/budgets/${budgetId}`
-  //       )
+      const responseWhenReadAfterDeleted = await requestWithAuth.get(
+        `/transactions/${transactionId}`
+      )
 
-  //       expect(responseWhenRead.body).toEqual(attributes)
-  //       expect(responseWhenDeleted.body).toEqual(attributes)
-  //       expect(responseWhenReadAfterDeleted.status).toBe(404)
-  //       expect(responseWhenReadAfterDeleted.body.errors).toEqual(
-  //         expect.any(Array)
-  //       )
-  //     })
+      expect(responseWhenRead.body).toEqual(createdTransaction)
+      expect(responseWhenDeleted.body).toEqual(createdTransaction)
+      expect(responseWhenReadAfterDeleted.status).toBe(404)
+      expect(responseWhenReadAfterDeleted.body.errors).toEqual(
+        expect.any(Array)
+      )
+    })
 
-  //     it('responds with 404 when the budget is not found', async () => {
-  //       const {
-  //         body: { errors },
-  //       } = await requestWithAuth.del(`/budgets/1`).expect(404)
-  //       expect(errors).toEqual(expect.any(Array))
-  //     })
-  //   })
+    it('responds with 404 when the transaction is not found', async () => {
+      const {
+        body: { errors },
+      } = await requestWithAuth.del(`/transactions/1`).expect(404)
+      expect(errors).toEqual(expect.any(Array))
+    })
+  })
 })
 
 describe('without authentication it responds with 403 Forbidden', () => {

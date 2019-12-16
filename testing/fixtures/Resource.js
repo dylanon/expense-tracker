@@ -5,7 +5,7 @@ class Resource {
     const { createdBy } = attributes
     if (!createdBy) {
       throw new Error(
-        'Resource: `createdBy` is a required argument in constructor.'
+        '[fixtures/Resource]: `createdBy` is a required argument in constructor.'
       )
     }
     this.dbTable = dbTable
@@ -20,8 +20,8 @@ class Resource {
       this.attributes = resource
       return resource
     } catch (error) {
-      throw new Error(
-        `Failed to create resource in table ${this.dbTable}. ${error}`
+      console.log(
+        `[fixtures/Resource]: Failed to create resource in table ${this.dbTable}. ${error}`
       )
     }
   }
@@ -34,8 +34,8 @@ class Resource {
         .returning('*')
       return destroyed
     } catch (error) {
-      throw new Error(
-        `Failed to delete resource with id ${this.attributes.id} from table '${this.dbTable}'. ${error}`
+      console.log(
+        `[fixtures/Resource]: Failed to delete resource with id ${this.attributes.id} from table '${this.dbTable}'. ${error}`
       )
     }
   }
