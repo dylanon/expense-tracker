@@ -64,7 +64,7 @@ class Resource {
     try {
       const { id } = await this.schemas.readSchema.validateAsync(req.params)
       const [resource] = await knex(this.dbTable)
-        .returning(this.returnAttributes)
+        .select(this.returnAttributes)
         .where('id', id)
       if (!resource) {
         // TODO: Add NotFoundError to error handling
