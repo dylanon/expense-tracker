@@ -239,20 +239,24 @@ describe('with authentication', () => {
     })
 
     it('prevents updating invalid properties', async () => {
-      const budget = new BudgetFixture({
-        projectId,
+      const transaction = new TransactionFixture({
+        amount: 211.11,
+        type: TRANSACTION_TYPE.EXPENSE,
+        name: 'Transaction H',
         createdBy: user.id,
       })
-      const { id: budgetId } = await budget.create()
+      const { id: transactionId } = await transaction.create()
 
       const updateCreatedBy = requestWithAuth
-        .patch(`/budgets/${budgetId}`)
+        .patch(`/transactions/${transactionId}`)
         .send({
           createdBy: user.id,
         })
-      const updateBlah = requestWithAuth.patch(`/budgets/${budgetId}`).send({
-        blah: 'Some text',
-      })
+      const updateBlah = requestWithAuth
+        .patch(`/transactions/${transactionId}`)
+        .send({
+          blah: 'Some text',
+        })
       const responses = await Promise.all([updateCreatedBy, updateBlah])
       responses.forEach(response => {
         const {
@@ -269,7 +273,7 @@ describe('with authentication', () => {
       const {
         body: { errors },
       } = await requestWithAuth
-        .patch(`/budgets/1`)
+        .patch(`/transactions/1`)
         .send({ name: 'New Name' })
         .expect(404)
       expect(errors).toEqual(expect.any(Array))
