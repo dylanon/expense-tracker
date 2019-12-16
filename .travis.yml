@@ -12,4 +12,4 @@ before_install:
   - ./wait-for-it.sh localhost:5432 --timeout=300 --strict -- echo "Test database is up."
 
 script:
-  - docker-compose run api yarn test
+  - docker-compose run --no-deps api yarn test
