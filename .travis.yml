@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - 12
+
+services:
+  - docker
+
+before_install:
+  - curl https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh > wait-for-it.sh
+  - chmod 754 wait-for-it.sh
+  - docker-compose run --name="test_db" --detach --publish 5432:5432 test_db
+  - ./wait-for-it.sh localhost:5432 --timeout=300 --strict -- echo "Test database is up."
+
+script:
+  - docker-compose run --no-deps api yarn test

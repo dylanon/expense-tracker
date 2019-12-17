@@ -5,7 +5,10 @@ services:
     depends_on:
       - db
       - test_db
-    env_file: .env
+    environment:
+      - API_PORT
+      - API_START_COMMAND
+      - AUTH_SIGNING_SECRET
     ports:
       - '${API_PORT}:${API_PORT}'
     volumes:
