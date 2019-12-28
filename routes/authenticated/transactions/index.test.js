@@ -54,6 +54,7 @@ describe('with authentication', () => {
         date: '2019-12-01',
         name: 'Transaction One',
         type: TRANSACTION_TYPE.EXPENSE,
+        budgetId,
         createdBy: user.id,
       },
       {
@@ -61,6 +62,7 @@ describe('with authentication', () => {
         date: '2019-12-13',
         name: 'Transaction Two',
         type: TRANSACTION_TYPE.INCOME,
+        budgetId,
         createdBy: user.id,
       },
       {
@@ -68,6 +70,7 @@ describe('with authentication', () => {
         date: '2019-12-11',
         name: 'Transaction Three',
         type: TRANSACTION_TYPE.EXPENSE,
+        budgetId,
         createdBy: user.id,
       },
     ]
@@ -103,6 +106,7 @@ describe('with authentication', () => {
         .send({
           amount,
           type,
+          budgetId,
         })
         .expect(201)
 
@@ -112,6 +116,7 @@ describe('with authentication', () => {
           type,
           date: null,
           name: null,
+          budgetId,
           id: expect.any(String),
           createdBy: user.id,
         })
@@ -135,6 +140,7 @@ describe('with authentication', () => {
           date,
           name,
           type,
+          budgetId,
         })
         .expect(201)
 
@@ -144,6 +150,7 @@ describe('with authentication', () => {
           date: formattedDate,
           name,
           type,
+          budgetId,
           id: expect.any(String),
           createdBy: user.id,
         })
@@ -180,6 +187,7 @@ describe('with authentication', () => {
         amount: 111.11,
         type: TRANSACTION_TYPE.EXPENSE,
         name: 'Transaction Z',
+        budgetId,
         createdBy: user.id,
       })
       const createdTransaction = await transaction.create()
@@ -199,17 +207,29 @@ describe('with authentication', () => {
   })
 
   describe('update', () => {
+    let otherBudget
+    beforeAll(async () => {
+      otherBudget = new BudgetFixture({ projectId, createdBy: user.id })
+      await otherBudget.create()
+    })
+
+    afterAll(async () => {
+      await otherBudget.destroy()
+    })
+
     it('updates transaction attributes', async () => {
       const originalAttributes = {
         amount: 502.15,
         date: '2019-12-13',
         name: 'Transaction Q',
         type: TRANSACTION_TYPE.INCOME,
+        budgetId,
         createdBy: user.id,
       }
       const attributesToUpdate = {
         name: 'Transaction R',
         type: TRANSACTION_TYPE.EXPENSE,
+        budgetId: otherBudget.attributes.id,
       }
       const transaction = new TransactionFixture(originalAttributes)
       const { id: transactionId } = await transaction.create()
@@ -243,6 +263,7 @@ describe('with authentication', () => {
         amount: 211.11,
         type: TRANSACTION_TYPE.EXPENSE,
         name: 'Transaction H',
+        budgetId,
         createdBy: user.id,
       })
       const { id: transactionId } = await transaction.create()
@@ -286,6 +307,7 @@ describe('with authentication', () => {
         amount: 111.11,
         type: TRANSACTION_TYPE.EXPENSE,
         name: 'Transaction W',
+        budgetId,
         createdBy: user.id,
       })
       const createdTransaction = await transaction.create()
