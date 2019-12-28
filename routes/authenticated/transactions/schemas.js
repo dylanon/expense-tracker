@@ -7,6 +7,7 @@ const byIdSchema = joi.object({
 
 const createSchema = joi.object({
   amount: joi.number().required(),
+  budgetId: joi.number().required(),
   date: joi.date(),
   name: joi.string(),
   type: joi
@@ -20,6 +21,7 @@ const updateParamsSchema = byIdSchema
 const updateBodySchema = joi
   .object({
     amount: joi.number(),
+    budgetId: joi.number(),
     date: joi.date(),
     name: joi.string(),
     type: joi.string().valid(...Object.values(TRANSACTION_TYPE)),
