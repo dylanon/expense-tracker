@@ -15,7 +15,7 @@ const createSchema = joi.object({
 const updateParamsSchema = byIdSchema
 
 const updateBodySchema = joi.object({
-  // TODO: Allow updates to projectId
+  projectId: joi.number(),
   name: joi.string(),
   startDate: joi.date().timestamp(),
   endDate: joi.date().timestamp(),

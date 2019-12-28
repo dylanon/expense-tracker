@@ -107,7 +107,7 @@ describe('with authentication', () => {
       )
     })
 
-    it('creates a project with all possible attributes', async () => {
+    it('creates a budget with all possible attributes', async () => {
       const attributes = {
         projectId,
         name: 'Budget A',
@@ -143,7 +143,7 @@ describe('with authentication', () => {
       expect(body).toEqual(expect.objectContaining(expectedProperties))
     })
 
-    it('prevents creation a budget with invalid attributes', async () => {
+    it('prevents creation of a budget with invalid attributes', async () => {
       const createWithCreatedBy = requestWithAuth.post('/budgets').send({
         projectId,
         name: 'Budget B',
@@ -188,6 +188,16 @@ describe('with authentication', () => {
   })
 
   describe('update', () => {
+    let otherProject
+    beforeAll(async () => {
+      otherProject = new ProjectFixture({ createdBy: user.id })
+      await otherProject.create()
+    })
+
+    afterAll(async () => {
+      await otherProject.destroy()
+    })
+
     it('updates budget attributes', async () => {
       const originalAttributes = {
         projectId,
@@ -195,6 +205,7 @@ describe('with authentication', () => {
         name: 'Old Budget C',
       }
       const attributesToUpdate = {
+        projectId: otherProject.attributes.id,
         name: 'Budget C',
         startDate: 1572566400000,
         endDate: 1575158399999,
