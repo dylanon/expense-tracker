@@ -207,6 +207,16 @@ describe('with authentication', () => {
   })
 
   describe('update', () => {
+    let otherBudget
+    beforeAll(async () => {
+      otherBudget = new BudgetFixture({ projectId, createdBy: user.id })
+      await otherBudget.create()
+    })
+
+    afterAll(async () => {
+      await otherBudget.destroy()
+    })
+
     it('updates transaction attributes', async () => {
       const originalAttributes = {
         amount: 502.15,
@@ -216,8 +226,6 @@ describe('with authentication', () => {
         budgetId,
         createdBy: user.id,
       }
-      const otherBudget = new BudgetFixture({ projectId, createdBy: user.id })
-      await otherBudget.create()
       const attributesToUpdate = {
         name: 'Transaction R',
         type: TRANSACTION_TYPE.EXPENSE,
