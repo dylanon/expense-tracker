@@ -40,7 +40,9 @@ class Resource {
   }
 
   list = async (req, res) => {
-    const list = await knex(this.dbTable).select(this.returnAttributes)
+    const list = await knex(this.dbTable)
+      .select(this.returnAttributes)
+      .where('id', req.user.id)
     res.json(list)
   }
 

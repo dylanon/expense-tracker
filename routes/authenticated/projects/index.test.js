@@ -3,6 +3,7 @@ const ProjectFixture = require('../../../testing/fixtures/Project')
 const {
   clearTable,
   createAuthenticatedClient,
+  createDatabaseNoise,
   requestWithoutAuth,
 } = require('../../../testing/helpers')
 
@@ -29,24 +30,37 @@ describe('with authentication', () => {
     await user.destroy()
   })
 
-  it('lists projects', async () => {
-    const projectNames = [
-      'Project One',
-      'Project Two',
-      'Project Three',
-      undefined,
-    ]
-    const projectFixtures = projectNames.map(
-      name => new ProjectFixture({ name, createdBy: user.id })
-    )
-    const projectCreateOperations = projectFixtures.map(project =>
-      project.create()
-    )
-    const expectedProjects = await Promise.all(projectCreateOperations)
+  describe('list', () => {
+    let cleanupNoise
 
-    const { body } = await requestWithAuth.get('/projects').expect(200)
-    body.forEach(returnedProject => {
-      expect(expectedProjects).toContainEqual(returnedProject)
+    beforeEach(async () => {
+      cleanupNoise = await createDatabaseNoise()
+    })
+
+    afterEach(async () => {
+      await cleanupNoise()
+    })
+
+    it(`lists the user's projects`, async () => {
+      const projectNames = [
+        'Project One',
+        'Project Two',
+        'Project Three',
+        undefined,
+      ]
+      const projectFixtures = projectNames.map(
+        name => new ProjectFixture({ name, createdBy: user.id })
+      )
+      const projectCreateOperations = projectFixtures.map(project =>
+        project.create()
+      )
+      const expectedProjects = await Promise.all(projectCreateOperations)
+
+      const { body } = await requestWithAuth.get('/projects').expect(200)
+      body.forEach(returnedProject => {
+        expect(expectedProjects).toContainEqual(returnedProject)
+        expect(returnedProject.createdBy).toBe(user.id)
+      })
     })
   })
 

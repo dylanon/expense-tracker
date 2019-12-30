@@ -7,6 +7,7 @@ const TransactionFixture = require('../../../testing/fixtures/Transaction')
 const {
   clearTable,
   createAuthenticatedClient,
+  createDatabaseNoise,
   requestWithoutAuth,
 } = require('../../../testing/helpers')
 const { TRANSACTION_TYPE } = require('../../../constants')
@@ -47,49 +48,62 @@ describe('with authentication', () => {
     await clearTable('users')
   })
 
-  it('lists transactions', async () => {
-    const transactionAttributes = [
-      {
-        amount: 10,
-        date: '2019-12-01',
-        name: 'Transaction One',
-        type: TRANSACTION_TYPE.EXPENSE,
-        budgetId,
-        createdBy: user.id,
-      },
-      {
-        amount: 500.45,
-        date: '2019-12-13',
-        name: 'Transaction Two',
-        type: TRANSACTION_TYPE.INCOME,
-        budgetId,
-        createdBy: user.id,
-      },
-      {
-        amount: 74.12,
-        date: '2019-12-11',
-        name: 'Transaction Three',
-        type: TRANSACTION_TYPE.EXPENSE,
-        budgetId,
-        createdBy: user.id,
-      },
-    ]
-    const transactionFixtures = transactionAttributes.map(
-      attributes => new TransactionFixture(attributes)
-    )
-    const transactionCreateOperations = transactionFixtures.map(transaction =>
-      transaction.create()
-    )
-    const createdTransactions = await Promise.all(transactionCreateOperations)
-    const expectedTransactions = createdTransactions.map(transaction => {
-      return Object.assign({}, transaction, {
-        date: moment(transaction.date).toISOString(),
-      })
+  describe('list', () => {
+    let cleanupNoise
+
+    beforeEach(async () => {
+      cleanupNoise = await createDatabaseNoise()
     })
 
-    const { body } = await requestWithAuth.get('/transactions').expect(200)
-    body.forEach(returnedTransaction => {
-      expect(expectedTransactions).toContainEqual(returnedTransaction)
+    afterEach(async () => {
+      await cleanupNoise()
+    })
+
+    it(`lists the user's transactions`, async () => {
+      const transactionAttributes = [
+        {
+          amount: 10,
+          date: '2019-12-01',
+          name: 'Transaction One',
+          type: TRANSACTION_TYPE.EXPENSE,
+          budgetId,
+          createdBy: user.id,
+        },
+        {
+          amount: 500.45,
+          date: '2019-12-13',
+          name: 'Transaction Two',
+          type: TRANSACTION_TYPE.INCOME,
+          budgetId,
+          createdBy: user.id,
+        },
+        {
+          amount: 74.12,
+          date: '2019-12-11',
+          name: 'Transaction Three',
+          type: TRANSACTION_TYPE.EXPENSE,
+          budgetId,
+          createdBy: user.id,
+        },
+      ]
+      const transactionFixtures = transactionAttributes.map(
+        attributes => new TransactionFixture(attributes)
+      )
+      const transactionCreateOperations = transactionFixtures.map(transaction =>
+        transaction.create()
+      )
+      const createdTransactions = await Promise.all(transactionCreateOperations)
+      const expectedTransactions = createdTransactions.map(transaction => {
+        return Object.assign({}, transaction, {
+          date: moment(transaction.date).toISOString(),
+        })
+      })
+
+      const { body } = await requestWithAuth.get('/transactions').expect(200)
+      body.forEach(returnedTransaction => {
+        expect(expectedTransactions).toContainEqual(returnedTransaction)
+        expect(returnedTransaction.createdBy).toBe(user.id)
+      })
     })
   })
 

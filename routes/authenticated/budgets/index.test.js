@@ -6,6 +6,7 @@ const BudgetFixture = require('../../../testing/fixtures/Budget')
 const {
   clearTable,
   createAuthenticatedClient,
+  createDatabaseNoise,
   requestWithoutAuth,
 } = require('../../../testing/helpers')
 
@@ -38,50 +39,65 @@ describe('with authentication', () => {
     await user.destroy()
   })
 
-  it('lists budgets', async () => {
-    const { id: projectId } = project.attributes
-    const budgetAttributes = [
-      {
-        projectId,
-        name: 'Budget One',
-        createdBy: user.id,
-      },
-      {
-        projectId,
-        name: 'Budget Two',
-        startDate: 1572566400000,
-        endDate: 1575158399999,
-        target: 2500,
-        createdBy: user.id,
-      },
-      {
-        projectId,
-        name: 'Budget Three',
-        startDate: 1575158400000,
-        endDate: 1577836799999,
-        target: 2250,
-        createdBy: user.id,
-      },
-    ]
-    const budgetFixtures = budgetAttributes.map(
-      attributes => new BudgetFixture(attributes)
-    )
-    const budgetCreateOperations = budgetFixtures.map(budget => budget.create())
-    const createdBudgets = await Promise.all(budgetCreateOperations)
-    const expectedBudgets = createdBudgets.map(budget => {
-      return Object.assign({}, budget, {
-        startDate: budget.startDate
-          ? moment(budget.startDate).toISOString()
-          : budget.startDate,
-        endDate: budget.endDate
-          ? moment(budget.endDate).toISOString()
-          : budget.endDate,
-      })
-      return budget
+  describe('list', () => {
+    let cleanupNoise
+
+    beforeEach(async () => {
+      cleanupNoise = await createDatabaseNoise()
     })
-    const { body } = await requestWithAuth.get('/budgets').expect(200)
-    body.forEach(returnedBudget => {
-      expect(expectedBudgets).toContainEqual(returnedBudget)
+
+    afterEach(async () => {
+      await cleanupNoise()
+    })
+
+    it(`lists the user's budgets`, async () => {
+      const { id: projectId } = project.attributes
+      const budgetAttributes = [
+        {
+          projectId,
+          name: 'Budget One',
+          createdBy: user.id,
+        },
+        {
+          projectId,
+          name: 'Budget Two',
+          startDate: 1572566400000,
+          endDate: 1575158399999,
+          target: 2500,
+          createdBy: user.id,
+        },
+        {
+          projectId,
+          name: 'Budget Three',
+          startDate: 1575158400000,
+          endDate: 1577836799999,
+          target: 2250,
+          createdBy: user.id,
+        },
+      ]
+      const budgetFixtures = budgetAttributes.map(
+        attributes => new BudgetFixture(attributes)
+      )
+      const budgetCreateOperations = budgetFixtures.map(budget =>
+        budget.create()
+      )
+      const createdBudgets = await Promise.all(budgetCreateOperations)
+      const expectedBudgets = createdBudgets.map(budget => {
+        return Object.assign({}, budget, {
+          startDate: budget.startDate
+            ? moment(budget.startDate).toISOString()
+            : budget.startDate,
+          endDate: budget.endDate
+            ? moment(budget.endDate).toISOString()
+            : budget.endDate,
+        })
+        return budget
+      })
+      const { body } = await requestWithAuth.get('/budgets').expect(200)
+      body.forEach(returnedBudget => {
+        expect(expectedBudgets).toContainEqual(returnedBudget)
+        expect(returnedBudget.createdBy).toBe(user.id)
+      })
     })
   })
 
