@@ -7,8 +7,12 @@ const { errorHandler } = require('../middleware')
 
 const app = express()
 
-// TODO: Configure logging based on environment
-app.use(morgan('dev'))
+// TODO: Configure production logging format
+let loggerFormat = 'dev'
+if (process.env.NODE_ENV === 'test') {
+  loggerFormat = () => null
+}
+app.use(morgan(loggerFormat))
 app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(routes)
