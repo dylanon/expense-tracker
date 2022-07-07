@@ -26,7 +26,7 @@
     "format-currency": "^1.0.0",
     "git-cz": "^3.3.0",
     "jest": "^24.9.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "nodemon": "^1.19.4",
     "supertest": "^4.0.2"
   },
